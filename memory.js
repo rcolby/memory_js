@@ -1,31 +1,93 @@
 ﻿// var uniChars = "🐮🐗🐵🐒🐴🐑🐘🐼🐧🐦🐤🐥🐣🐔🐍🐢🐛🐝🐜🐞🐌🐙🐚🐠🐟🐬🐳🐋ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
+var that;
+
+function Card(faceValue) {
+  this.faceValue = faceValue;
+  this.faceUp = false;
+  this.paired = false;
+}
+
 function Memory(size) {
-  this.size = size;
-  this.matrix = [];
-  this.winningCombos = [];
+  that = this;
+
+  that.size = size;
+
+  that.matrix = [];
+  // stores cards in the matrix array as a card object:
+  /* var card = {
+    "faceValue" : "A",
+    "faceUp" : false,
+    "paired" : false
+  };*/
+
+  // that.winningCombos = [];
   var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   var subset = characters.substring(0, size/2);
 
-  var that = this;
-
   function initialize() {
-    _.each(_.shuffle(subset), function(i) {that.matrix.push(i);});
-    _.each(_.shuffle(subset), function(i) {that.matrix.push(i);});
-    _.each(subset, function(i) {
-      that.winningCombos.push([_.indexOf(that.matrix, i), _.lastIndexOf(that.matrix, i)]);
+    _.each(subset, function(letter) {
+      that.matrix.push(new Card(letter));
+      that.matrix.push(new Card(letter));
     });
+
+    that.matrix = _.shuffle(that.matrix);
+
+    // _.each(subset, function(letter) {
+    //   var lettersMatrix = _.pluck(that.matrix, 'faceValue');
+    //   that.winningCombos.push([_.indexOf(lettersMatrix, letter), _.lastIndexOf(lettersMatrix, letter)]);
+    // });
   }
 
-  // card must be a jquery element with an id of e.g. "card-0"
-  this.reveal = function (card) {
-    var index = (card.attr("id").split("-"))[1];
-    var letter = that.matrix[index];
-    card.empty();
-    card.html(letter);
-    card.addClass("face-up");
-    card.removeClass("face-down");
+  // cardEl must be a jquery element with an id of e.g. "card-0"
+  that.reveal = function (cardEl) {
+    var index = getIndex(cardEl);
+    var letter = that.matrix[index].faceValue;
+    that.matrix[index].faceUp = true;
+
+    cardEl.empty();
+    cardEl.html(letter);
+    cardEl.addClass("face-up");
+    cardEl.removeClass("face-down");
   };
+
+  // cardEl must be a jquery element with an id of e.g. "card-0"
+  that.hide = function (cardEl) {
+    var index = getIndex(cardEl);
+    var cardObj = that.matrix[index];
+
+    // if the card is paired, we want it to still show
+    if (!cardObj.paired) {
+      that.matrix[index].faceUp = false;
+      cardEl.empty();
+      cardEl.addClass("face-down");
+      cardEl.removeClass("face-up");
+    }
+  };
+
+  // takes two cardEl elements, which should already be revealed
+  that.checkForMatch = function (cardEl1, cardEl2) {
+    var index1 = getIndex(cardEl1);
+    var index2 = getIndex(cardEl2);
+    var cardObj1 = that.matrix[index1];
+    var cardObj2 = that.matrix[index2];
+
+    if (cardObj1.faceValue === cardObj2.faceValue) {
+      cardObj1.paired = true;
+      cardObj2.paired = true;
+      // return true;
+    }
+    else {
+      that.hide(cardEl1);
+      that.hide(cardEl2);
+      // return false;
+    }
+  };
+
+  // cardEl must be a jquery element with an id of e.g. "card-0"
+  function getIndex(cardEl) {
+    return (cardEl.attr("id").split("-"))[1];
+  }
 
   initialize();
   return that;
