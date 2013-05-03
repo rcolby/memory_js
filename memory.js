@@ -21,7 +21,10 @@ function Memory(size) {
   this.reveal = function (card) {
     var index = (card.attr("id").split("-"))[1];
     var letter = that.matrix[index];
-    card.append('<span>' + letter + '</span>');
+    card.empty();
+    card.html(letter);
+    card.addClass("face-up");
+    card.removeClass("face-down");
   };
 
   initialize();
@@ -54,7 +57,8 @@ $(document).ready(function(){
   var cards = $('.card');
   cards.children('span').detach();
 
-  m.reveal($('#card-0'));
+  $('#board').on("click", ".card", function () { m.reveal($(this)); } );
+  // $('#search-results').on("click", "li.result", displayMovie);
 
 });
 

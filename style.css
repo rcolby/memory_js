@@ -6,7 +6,7 @@
 .card {
   width: 70px;
   height: 70px;
-  display: inline-block;
+  display: block;
   border: 1px solid purple;
   border-radius: 8px;
   margin: 10px;
@@ -15,6 +15,7 @@
   font-family: Arial;
   font-size: 36px;
   color: purple;
+  float: left;
 }
 
 .face-down {
