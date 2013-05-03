@@ -1,6 +1,23 @@
 .wrapper {
   margin: 40px auto;
   width: 460px;
+  font-family: Arial;
+}
+
+button {
+  line-height: 30px;
+  padding: 10px;
+  font-size: 24px;
+  margin-right: 10px;
+  border-radius: 8px;
+}
+
+#board {
+  margin-top: 30px;
+}
+
+h1, .buttons {
+  text-align: center;
 }
 
 .card {
@@ -12,7 +29,6 @@
   margin: 10px;
   text-align: center;
   padding-top: 30px;
-  font-family: Arial;
   font-size: 36px;
   color: purple;
   float: left;
@@ -26,6 +42,17 @@
   background: white;
 }
 
+.matched {
+  color: rgb(63, 41, 41);
+  background-color: rgb(157, 243, 243);
+  border-color: rgb(47, 65, 65);
+  font-weight: bold;
+}
+
 .face-down:hover {
   background: orchid;
+}
+
+.hidden {
+  display: none;
 }

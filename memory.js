@@ -75,12 +75,14 @@ function Memory(size) {
     if (cardObj1.faceValue === cardObj2.faceValue) {
       cardObj1.paired = true;
       cardObj2.paired = true;
-      // return true;
+      return true;
     }
     else {
+      cardObj1.faceUp = false;
+      cardObj2.faceUp = false;
       that.hide(cardEl1);
       that.hide(cardEl2);
-      // return false;
+      return false;
     }
   };
 
@@ -89,6 +91,37 @@ function Memory(size) {
     return (cardEl.attr("id").split("-"))[1];
   }
 
+  that.getNonPairedVisibleCardEls = function () {
+    var cardEls = [];
+
+    for (var i = 0; i < that.matrix.length; i += 1) {
+      if (that.matrix[i].faceUp && !that.matrix[i].paired) {
+        cardEls.push($('#card-' + i));
+      }
+    }
+    return cardEls;
+  };
+
+  that.getNumPairedCards = function () {
+    var number = 0;
+    _.each(that.matrix, function (card) {
+      if (card.paired) {
+        number += 1;
+      }
+    });
+    return number;
+  };
+
+  that.getNumRevealedCards = function () {
+    var number = 0;
+    _.each(that.matrix, function (card) {
+      if (card.faceUp) {
+        number += 1;
+      }
+    });
+    return number;
+  };
+
   initialize();
   return that;
 }
@@ -96,6 +129,8 @@ function Memory(size) {
 function draw(memory) {
   var card;
   var span;
+
+  $('#board').empty();
 
   _.each(memory.matrix, function(letter, index, list){
     card = $('<div class="card face-down"></div>');
@@ -112,15 +147,66 @@ function draw(memory) {
 }
 
 $(document).ready(function(){
-  var small = 10;
-  var m = new Memory(small);
-  draw(m);
 
-  var cards = $('.card');
-  cards.children('span').detach();
+  var games = {
+    "Small": 10,
+    "Medium": 20,
+    "Large": 40
+  };
 
-  $('#board').on("click", ".card", function () { m.reveal($(this)); } );
-  // $('#search-results').on("click", "li.result", displayMovie);
+  var clickCounter, m, stopwatch, timer;
+  stopwatch = new Stopwatch();
+  stopwatch.resolution = 1000;
+
+  $('button').on("click", function (event) {
+    var size = $(event.target).text();
+    m = new Memory(games[size]);
+
+    draw(m);
+
+    var cards = $('.card');
+    cards.children('span').detach();
+
+    $(".information").removeClass('hidden');
+
+    clickCounter = 0;
+    stopwatch.reset();
+    stopwatch.start();
+    timer = setInterval( function () { $('.timer').html(stopwatch.toString()); }, 1000 );
+  });
+
+
+  $('#board').on("click", ".card", function () {
+
+    clickCounter += 1;
+
+    m.reveal($(this));
+
+    var newClicks = m.getNonPairedVisibleCardEls();
+
+    console.log(newClicks.length);
+    console.log(newClicks[0]);
+    console.log(newClicks[1]);
+    console.log("click counter: " + clickCounter);
+
+    if (newClicks.length === 2 && clickCounter % 2 === 0) {
+      if (that.checkForMatch(newClicks[0], newClicks[1])) {
+        newClicks[0].addClass("matched");
+        newClicks[1].addClass("matched");
+      }
+      // else if (clickCounter % 3 === 0) {
+      //   m.hide(newClicks[0]);
+      //   m.hide(newClicks[1]);
+      // }
+    }
+
+    $('.information .click-count').html(clickCounter);
+
+    if (m.matrix.length === m.getNumPairedCards()) {
+      clearInterval(timer);
+      stopwatch.stop();
+      $('.information').append('<h1>Congrats!</h1>');
+    }
+  });
 
 });
-
