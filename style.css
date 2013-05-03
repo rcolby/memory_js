@@ -1,0 +1,30 @@
+.wrapper {
+  margin: 40px auto;
+  width: 460px;
+}
+
+.card {
+  width: 70px;
+  height: 70px;
+  display: inline-block;
+  border: 1px solid purple;
+  border-radius: 8px;
+  margin: 10px;
+  text-align: center;
+  padding-top: 30px;
+  font-family: Arial;
+  font-size: 36px;
+  color: purple;
+}
+
+.face-down {
+  background: purple;
+}
+
+.face-up {
+  background: white;
+}
+
+.face-down:hover {
+  background: orchid;
+}
