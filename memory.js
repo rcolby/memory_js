@@ -65,23 +65,40 @@ function Memory(size) {
     }
   };
 
+  that.hideAll = function () {
+    for (var i = 0; i < that.matrix.length; i += 1) {
+      that.hide($("#card-" + i));
+    }
+  };
+
   // takes two cardEl elements, which should already be revealed
   that.checkForMatch = function (cardEl1, cardEl2) {
+    if (!cardEl2) {
+      return false;
+    }
+
     var index1 = getIndex(cardEl1);
     var index2 = getIndex(cardEl2);
     var cardObj1 = that.matrix[index1];
     var cardObj2 = that.matrix[index2];
 
+    // var hideStuff = function () {
+    //   that.hide(cardEl1);
+    //   that.hide(cardEl2);
+    // };
+
     if (cardObj1.faceValue === cardObj2.faceValue) {
       cardObj1.paired = true;
       cardObj2.paired = true;
+      that.hideAll();
       return true;
     }
     else {
-      cardObj1.faceUp = false;
-      cardObj2.faceUp = false;
-      that.hide(cardEl1);
-      that.hide(cardEl2);
+      // that.hide(cardEl1);
+      // that.hide(cardEl2);
+      // // cardTimer = setTimeout(hideStuff, 1000);
+      // cardObj1.faceUp = false;
+      // cardObj2.faceUp = false;
       return false;
     }
   };
@@ -154,7 +171,7 @@ $(document).ready(function(){
     "Large": 40
   };
 
-  var clickCounter, m, stopwatch, timer;
+  var clickCounter, m, stopwatch, timer, cardTimer;
   stopwatch = new Stopwatch();
   stopwatch.resolution = 1000;
 
@@ -170,34 +187,33 @@ $(document).ready(function(){
     $(".information").removeClass('hidden');
 
     clickCounter = 0;
+    maxClicks = 0;
     stopwatch.reset();
     stopwatch.start();
     timer = setInterval( function () { $('.timer').html(stopwatch.toString()); }, 1000 );
   });
 
+  $('#board').on("click", ".card", function (event) {
 
-  $('#board').on("click", ".card", function () {
-
-    clickCounter += 1;
+    // only increment the click counters when clicking on a face down non-matched card
+    if (!$(event.target).hasClass("matched") && $(event.target).hasClass("face-down")) {
+      maxClicks += 1;
+      if (!(maxClicks === 3)) {
+        clickCounter += 1;
+      }
+    }
 
     m.reveal($(this));
 
     var newClicks = m.getNonPairedVisibleCardEls();
 
-    console.log(newClicks.length);
-    console.log(newClicks[0]);
-    console.log(newClicks[1]);
-    console.log("click counter: " + clickCounter);
-
-    if (newClicks.length === 2 && clickCounter % 2 === 0) {
-      if (that.checkForMatch(newClicks[0], newClicks[1])) {
-        newClicks[0].addClass("matched");
-        newClicks[1].addClass("matched");
-      }
-      // else if (clickCounter % 3 === 0) {
-      //   m.hide(newClicks[0]);
-      //   m.hide(newClicks[1]);
-      // }
+    if (that.checkForMatch(newClicks[0], newClicks[1])) {
+      newClicks[0].addClass("matched");
+      newClicks[1].addClass("matched");
+    }
+    else if (maxClicks === 3) {
+      m.hideAll();
+      maxClicks = 0;
     }
 
     $('.information .click-count').html(clickCounter);
