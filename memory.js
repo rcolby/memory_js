@@ -148,6 +148,9 @@ function draw(memory) {
   var span;
 
   $('#board').empty();
+  $('.click-count').html('0');
+  $('.timer').html('00:00:00');
+  $('h1.congrats').empty();
 
   _.each(memory.matrix, function(letter, index, list){
     card = $('<div class="card face-down"></div>');
@@ -221,7 +224,7 @@ $(document).ready(function(){
     if (m.matrix.length === m.getNumPairedCards()) {
       clearInterval(timer);
       stopwatch.stop();
-      $('.information').append('<h1>Congrats!</h1>');
+      $('.information').append('<h1 class="congrats">Congrats!</h1>');
     }
   });
 
